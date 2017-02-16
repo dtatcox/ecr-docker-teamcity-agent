@@ -22,9 +22,15 @@ RUN apt-get update && \
 		jq \
 		openjdk-8-jdk
 		
-RUN curl -fsSL https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip > /tmp/packer.zip && \
-	unzip /tmp/packer.zip -d /bin && \
-	rm -f /tmp/packer.zip
+# Setup docker-credential-ecr-login
+COPY config.json /root/.docker/config.json
+RUN chmod 0644 /root/.docker/config.json
+
+COPY config.json /home/buildagent/.docker/config.json
+RUN chmod 0644 /home/buildagent/.docker/config.json
+
+COPY bin/docker-credential-ecr-login /usr/bin/docker-credential-ecr-login
+RUN chmod 0755 /usr/bin/docker-credential-ecr-login
     
 RUN usermod -aG docker buildagent
 
